@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!--
+        Sets defaults, including turning down logging for tomcat 
+     -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    
+    <!--
+        Use the JVM property log.dir to specify where log files should go.  That directory must exist.
+        The logger will not create it. 
+     -->
+    <property name="LOG_DIR" value="${log.dir:-./target/log}" />
+    
+    <!--
+        The first part of the filname of the log file.   
+     -->
+    <property name="LOG_FILE_BASE_NAME" value="application" />
+
+    <!--
+        Format for a log message.  Note the time is in UTC and has the Z appended to the timestamp
+        so the person reading the logs will know that. 
+     -->
+    <property name="ENCODER_PATTERN"
+        value="%d{yyyy-MM-dd HH:mm:ss.SSS'Z', UTC} %-15([%thread]) %-5level %logger{40}  - %msg%n" />
+
+    <!--
+        Appender that will roll logs daily.  If the current log gets larger than maxFileSize, it
+        also rolls the log.  It tries the keep maxHistory previous log files, but all the logs
+        will not exceed totalSizeCap. 
+     -->
+    <appender name="ROLLING_FILE"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE_BASE_NAME}.log</file>
+        <encoder>
+            <pattern>${ENCODER_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_DIR}/${LOG_FILE_BASE_NAME}-%d{yyyy-MM-dd, UTC}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${ENCODER_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+    
+</included>
